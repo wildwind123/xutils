@@ -3,6 +3,11 @@ package xutils
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
+	"unicode"
+
+	"github.com/go-faster/errors"
 )
 
 func RequestFullURL(r *http.Request) string {
@@ -25,4 +30,23 @@ func SliceToInterface[T any](items []T) []interface{} {
 	}
 
 	return list
+}
+
+func StringToInt64(v string) (int64, error) {
+
+	// Remove all non-numeric characters
+	cleanedStr := strings.Map(func(r rune) rune {
+		if unicode.IsDigit(r) {
+			return r
+		}
+		return -1
+	}, v)
+
+	// Convert the cleaned string to int64
+	num, err := strconv.ParseInt(cleanedStr, 10, 64)
+	if err != nil {
+		return 0, errors.Wrapf(err, "cant ParseInt. %s", v)
+	}
+
+	return num, nil
 }

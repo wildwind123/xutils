@@ -21,7 +21,9 @@ func (js *JSONScanner[T]) Scan(src interface{}) error {
 	if src == nil {
 		return nil
 	}
-	js.Val = new(T)
+	if js.Val == nil {
+		js.Val = new(T)
+	}
 	switch src := src.(type) {
 	case []byte:
 		return json.Unmarshal(src, js.Val)

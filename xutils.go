@@ -1,6 +1,7 @@
 package xutils
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -20,6 +21,18 @@ func RequestFullURL(r *http.Request) string {
 		return fmt.Sprintf("%s://%s%s?%s", scheme, r.Host, r.URL.Path, r.URL.RawQuery)
 	}
 	return fmt.Sprintf("%s://%s%s?%s#%s", scheme, r.Host, r.URL.Path, r.URL.RawQuery, r.URL.Fragment)
+}
+
+func RequestCtxFullURL(ctx context.Context) string {
+	r, ok := ctx.Value(CtxKeyRequest).(*http.Request)
+	if !ok {
+		return ""
+	}
+	return RequestFullURL(r)
+}
+
+func RequestToCtx(ctx context.Context, r *http.Request) context.Context {
+	return context.WithValue(ctx, CtxKeyRequest, r)
 }
 
 func SliceToInterface[T any](items []T) []interface{} {

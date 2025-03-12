@@ -13,7 +13,10 @@ import (
 
 func RequestFullURL(r *http.Request) string {
 	scheme := "http"
-	if r.TLS != nil {
+	
+	if forwardedProto := r.Header.Get("X-Forwarded-Proto"); forwardedProto == "https" {
+		scheme = "https"
+	} else if r.TLS != nil {
 		scheme = "https"
 	}
 

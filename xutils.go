@@ -3,7 +3,6 @@ package xutils
 import (
 	"context"
 	"fmt"
-	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
@@ -73,27 +72,4 @@ func Bulk[T any](items []T, chunkSize int) (chunks [][]T) {
 		items, chunks = items[chunkSize:], append(chunks, items[0:chunkSize:chunkSize])
 	}
 	return append(chunks, items)
-}
-
-func GetMultipartFileType(file multipart.File) (string, error) {
-	// Read the first 512 bytes (common size for file type detection)
-	buffer := make([]byte, 512)
-	n, err := file.Read(buffer)
-	if err != nil {
-		return "", fmt.Errorf("error reading file: %v", err)
-	}
-
-	// Reset the file pointer to the beginning after reading
-	_, err = file.Seek(0, 0)
-	if err != nil {
-		return "", fmt.Errorf("error resetting file pointer: %v", err)
-	}
-
-	// Trim buffer to actual bytes read
-	buffer = buffer[:n]
-
-	// Detect content type based on file header
-	contentType := http.DetectContentType(buffer)
-
-	return contentType, nil
 }

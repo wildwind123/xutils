@@ -73,3 +73,32 @@ func Bulk[T any](items []T, chunkSize int) (chunks [][]T) {
 	}
 	return append(chunks, items)
 }
+
+func IsImageFile(file multipart.File) (bool, error) {
+    // Read the first 512 bytes (common size for file type detection)
+    buffer := make([]byte, 512)
+    n, err := file.Read(buffer)
+    if err != nil {
+        return false, fmt.Errorf("error reading file: %v", err)
+    }
+
+    // Reset the file pointer to the beginning after reading
+    _, err = file.Seek(0, 0)
+    if err != nil {
+        return false, fmt.Errorf("error resetting file pointer: %v", err)
+    }
+
+    // Trim buffer to actual bytes read
+    buffer = buffer[:n]
+
+    // Detect content type based on file header
+    contentType := http.DetectContentType(buffer)
+
+    // Check if the content type is an image
+    switch contentType {
+    case "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp":
+        return true, nil
+    default:
+        return false, nil
+    }
+}

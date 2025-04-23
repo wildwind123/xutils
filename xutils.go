@@ -26,6 +26,17 @@ func RequestFullURL(r *http.Request) string {
 	return fmt.Sprintf("%s://%s%s?%s#%s", scheme, r.Host, r.URL.Path, r.URL.RawQuery, r.URL.Fragment)
 }
 
+func RequestHost(r *http.Request) string {
+	scheme := "http"
+
+	if forwardedProto := r.Header.Get("X-Forwarded-Proto"); forwardedProto == "https" {
+		scheme = "https"
+	} else if r.TLS != nil {
+		scheme = "https"
+	}
+	return fmt.Sprintf("%s://%s", scheme, r.Host)
+}
+
 func RequestCtxFullURL(ctx context.Context) string {
 	r, ok := ctx.Value(CtxKeyRequest).(*http.Request)
 	if !ok {
